@@ -10,6 +10,8 @@ if ((isset($_SESSION['user_id']) && session_id() === $_COOKIE['PHPSESSID'])) {
   $r2 = mysqli_query($db, $sql2);
   $sql2 = "Select * from formation_etudiant where user_id='$user_id'";
   $r3 = mysqli_query($db, $sql2);
+  $r4 = mysqli_query($db, $sql2);
+
   } 
 else {
   header("Location: connexion.php");
@@ -71,18 +73,18 @@ else {
             </a>
             <ul id="ddmenu_2" class="collapse dropdown-nav">
             <?php 
-             while ($formations2 = mysqli_fetch_array($r2)) { 
-                          $formation_info = "select titre from formation where id='$formations2[1]'";
-                          $titre = mysqli_query($db,$formation_info);
-                          $titre1 = mysqli_fetch_array($titre);
-                          echo"<li>
-                            <a href='#'>$titre1[0]</a>
-                          </li>";
-           }
-           ?>
-            </ul>
-          </li>
-          <span class="divider"><hr /></span>
+            while ($formations2 = mysqli_fetch_array($r2)) { 
+              $formation_info = "SELECT titre, id FROM formation WHERE id='$formations2[1]'";
+              $info = mysqli_query($db, $formation_info);
+              $info1 = mysqli_fetch_array($info);
+              
+              echo "<li>
+                      <a href='#' class='formation-btn' data-target='$info1[1]'>$info1[0]</a>
+                    </li>";
+            }
+            ?>
+          </ul>
+             <span class="divider"><hr /></span>
           <li class="nav-item">
             <a href="#"  id="toutFormationsbtn">
               <span class="icon">
@@ -100,7 +102,6 @@ else {
               <span class="text" >Tout les formations </span>    
             </a>
           </li>
-        </ul>
       </nav>
     </aside>
     <div class="overlay"></div>
@@ -155,13 +156,60 @@ else {
         </div>
       </header>
 
+  <?php
+  $formation_info = "SELECT * FROM formation";
+  $info = mysqli_query($db, $formation_info);
+  while ($info1 = mysqli_fetch_array($info)) {
+      echo "<section id='$info1[0]' style='display: none;'>
+              <div class='container'>
+                  <div class='row justify-content-center'>
+                      <div class='col-lg-6'>
+                          <div class='formation-wrapper text-center'>
+                              <div class='formation-wrapper2'>
+                                  <h2 class='mb-15'>$info1[1]</h2>
+                                  <p class='text-sm mb-15'>$info1[2]</p>
+                                  <div class='content'>
+                                      <span class='text-green'>$info1[3]</span><br>
+                                      <span class='text-gray'>$info1[5]</span><br>
+                                      <span class='text-gray'>$info1[6]</span>
+                                  </div>";
+  
+      $est_inscriper = "SELECT * FROM formation_etudiant WHERE formation_id='$info1[0]' AND user_id='$user_id'";
+      $info_inscriper = mysqli_query($db, $est_inscriper);
+  
+      if (mysqli_num_rows($info_inscriper) == 0) {
+          echo "<form method='POST' action='./server/inscrire.php'>
+                  <input type='hidden' name='formation_id' value='$info1[0]'>
+                  <input type='hidden' name='user_id' value='$user_id'>
+                  <div class='button-group d-flex justify-content-center mt-25'>
+                      <button class='main-btn primary-btn btn-hover w-100 text-center' type='submit'>
+                          S'inscriper
+                      </button>
+                  </div>
+                </form>";
+      } else {
+          echo "<div class='button-group d-flex justify-content-center mt-25'>
+                  Deja inscrit (inserer resources pedagogiques)
+                </div>";
+      }
+  
+      echo "</div>
+          </div>
+      </div>
+      </div>
+      </section>";
+  }
+  ?>
+  
+    
+
       <section class="section" id="MesFormations">
         <div class="container-fluid">
           <div class="title-wrapper pt-30">
             <div class="row align-items-center">
               <div class="col-md-6">
                 <div class="title">
-                  <h2>Votre formations</h2>
+                  <h2>Votre formation</h2>
                 </div>
               </div>
               <div class="col-md-6">
@@ -190,7 +238,7 @@ else {
                     if ($formations['type']== 'Fomation Diplomante') {
                 echo"
                       <div class='col-xl-6 col-lg-6 col-sm-6'>
-                        <a href='#' class='icon-card mb-30'>
+                        <a href='#' class='icon-card mb-30 formation-btn' data-target='$formations[0]'>
                           <div class='content'>
                             <h6 class='mb-10'>$formations[4]</h6>
                             <h3 class='text-bold mb-10'>$formations[1]</h3>
@@ -202,23 +250,28 @@ else {
                         </a>
                       </div>
                     ";
-                    }
-                    else {
-                      echo"<span class='divider'><hr /></span>
-                      <div class='col-xl-6 col-lg-6 col-sm-6'>
-                        <a href='#' class='icon-card mb-30'>
-                          <div class='content'>
-                            <h6 class='mb-10'>$formations[4]</h6>
-                            <h3 class='text-bold mb-10'>$formations[1]</h3>
-                            <span class='text-green'>$formations[3]</span><br>
-                            <span class='text-gray'>$formations[5]</span><br>
-                            <span class='text-gray'>$formations[6]</span>
-                            </p>
-                          </div>
-                      </a>
-                    </div>
-                    ";
-                    }
+                    }}
+                    echo"<span class='divider'><hr /></span>";
+                    while ($formations3 = mysqli_fetch_array($r4)) {
+                      $sql3 = "select * from formation where id='$formations3[1]'";
+                      $formation_info2 = mysqli_query($db, $sql3);
+                      $formations4= mysqli_fetch_array($formation_info2);
+                      if ($formations4['type']== 'Formation ciblée') {
+                  echo"
+                        <div class='col-xl-6 col-lg-6 col-sm-6'>
+                          <a href='#' class='icon-card mb-30 formation-btn' data-target='$formations4[0]'>
+                            <div class='content'>
+                              <h6 class='mb-10'>$formations4[4]</h6>
+                              <h3 class='text-bold mb-10'>$formations4[1]</h3>
+                              <span class='text-green'>$formations4[3]</span><br>
+                              <span class='text-gray'>$formations4[5]</span><br>
+                              <span class='text-gray'>$formations4[6]</span>
+                              </p>
+                            </div>
+                          </a>
+                        </div>
+                      ";
+                      }       
                     
               }   ?>
           
@@ -311,13 +364,13 @@ else {
         </div>
       </section>
 
-  <section id="toutFormations" style="display: none;">
+  <section id="toutFormations">
         <div class="container-fluid">
           <div class="title-wrapper pt-30">
             <div class="row align-items-center">
               <div class="col-md-6">
                 <div class="title">
-                  <h2>Tout les formations</h2>
+                  <h2>Toutes les formations</h2>
                 </div>
               </div>
               <div class="col-md-6">
@@ -342,7 +395,7 @@ else {
                     if ($formations['type']== 'Fomation Diplomante') {
                 echo"
                       <div class='col-xl-6 col-lg-6 col-sm-6'>
-                        <a href='#' class='icon-card mb-30'>
+                        <a href='#' class='icon-card mb-30 formation-btn' data-target='$formations[0]'>
                           <div class='content'>
                             <h6 class='mb-10'>$formations[4]</h6>
                             <h3 class='text-bold mb-10'>$formations[1]</h3>
@@ -361,7 +414,7 @@ else {
                       if ($formations3['type']== 'Formation ciblée') {
                   echo"
                         <div class='col-xl-6 col-lg-6 col-sm-6'>
-                          <a href='#' class='icon-card mb-30'>
+                        <a href='#' class='icon-card mb-30 formation-btn' data-target='$formations3[0]'>
                             <div class='content'>
                               <h6 class='mb-10'>$formations3[4]</h6>
                               <h3 class='text-bold mb-10'>$formations3[1]</h3>
@@ -377,19 +430,42 @@ else {
                     
               }   ?>
   </section>
+
     </main>
 
         <script src="assets/js/bootstrap.bundle.min.js"></script>
-<script>
+      <script>
+      document.querySelectorAll(".formation-btn").forEach(button => {
+        button.addEventListener("click", function(event) {
+          event.preventDefault();
+          
+          let targetId = this.getAttribute("data-target");
+
+          
+          document.querySelectorAll("section").forEach(section => {
+            section.style.display = "none";
+          });
+
+          document.getElementById(targetId).style.display = "block";
+        });
+      });
+
       document.getElementById("toutFormationsbtn").addEventListener("click", function() {
+        document.querySelectorAll("section").forEach(section => {
+          section.style.display = "none"; 
+        });
+
         document.getElementById("toutFormations").style.display = "block";
-        document.getElementById("MesFormations").style.display = "none";
       });
 
       document.getElementById("MesFormationsbtn").addEventListener("click", function() {
+        document.querySelectorAll("section").forEach(section => {
+          section.style.display = "none"; 
+        });
+
         document.getElementById("MesFormations").style.display = "block";
-        document.getElementById("toutFormations").style.display = "none";
       });
+
       </script>
   </body>
   

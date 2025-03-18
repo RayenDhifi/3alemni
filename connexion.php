@@ -59,7 +59,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <div class="form-wrapper">
                         <h2 class="mb-15">Connexion</h2>
                         <p class="text-sm mb-25">Connectez-vous pour accéder à votre compte.</p>
-                        <!-- Display error or success messages -->
                         <?php if ($error): ?>
                             <div class="alert alert-danger">
                                 <?php echo $error; ?>

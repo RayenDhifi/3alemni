@@ -200,10 +200,23 @@ p {
   text-decoration: underline;
 }
 
-/* ============ signup css ============= */
+
+.formation-wrapper {
+  background: #fff;
+  padding: 60px;
+  margin-top: 50px;
+  min-height: 300px;
+  display: flex;
+  justify-content: center;
+}
+
+.formation-wrapper2 {
+  width: 450px;
+}
+
 
 .signup-wrapper {
-  background: #fff;
+  background: #ffffff;
   padding: 60px;
   min-height: 600px;
   display: flex;
